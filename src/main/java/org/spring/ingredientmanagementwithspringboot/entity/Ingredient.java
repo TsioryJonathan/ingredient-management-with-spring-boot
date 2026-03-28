@@ -1,0 +1,41 @@
+package org.spring.ingredientmanagementwithspringboot.entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
+import org.spring.ingredientmanagementwithspringboot.entity.Enum.UnitType;
+
+import java.time.Instant;
+import java.util.List;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@ToString
+@EqualsAndHashCode
+public class Ingredient {
+    private Integer id;
+    private String name;
+    private org.spring.ingredientmanagementwithspringboot.entity.CategoryEnum category;
+    private Double price;
+    /* Ignore the stock movement for now */
+    @JsonIgnore
+    private List<StockMovement> stockMovementList;
+
+    /* getStockValueAt method */
+    public StockValue getStockValueAt(Instant time){
+        List<StockMovement> concerned =  stockMovementList.stream().filter(stockMovement -> stockMovement.getCreationDatetime().isBefore(time)
+        || stockMovement.getCreationDatetime().equals(time))
+                .toList();
+        double quantity = 0.0;
+        for (StockMovement sm : concerned) {
+            double quantitySm = sm.getValue().getQuantity();
+            UnitType unitType = sm.getValue().getUnit();
+            if(sm.getType() == org.spring.ingredientmanagementwithspringboot.entity.MovementTypeEnum.IN){
+                quantity += quantitySm;
+            } else {
+                quantity -= quantitySm;
+            }
+        }
+        return new StockValue(quantity, UnitType.KG);
+    };
+
+}
