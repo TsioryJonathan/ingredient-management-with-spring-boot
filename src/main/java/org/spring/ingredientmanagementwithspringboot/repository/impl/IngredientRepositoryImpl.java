@@ -20,6 +20,7 @@ public class IngredientRepositoryImpl implements IngredientRepository {
     public IngredientRepositoryImpl(Datasource datasource) {
         this.datasource = datasource;
     }
+
     @Override
     public List<Ingredient> findAll() {
         String ingSql = """
@@ -45,8 +46,34 @@ public class IngredientRepositoryImpl implements IngredientRepository {
     }
 
     @Override
-    public Ingredient findOne(long id) {
-        return null;
+    public Optional<Ingredient> findOne(int id) {
+        try(Connection connection = datasource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(
+                        """
+                                select ingredient.id, ingredient.name, ingredient.price, ingredient.category
+                                from ingredient
+                                where ingredient.id = ?;
+                                """);
+
+                ){
+            preparedStatement.setInt(1, id);
+            try(
+                ResultSet resultSet = preparedStatement.executeQuery();){
+                if (resultSet.next()) {
+                    Ingredient ingredient = new Ingredient();
+                    ingredient.setId(resultSet.getInt("id"));
+                    ingredient.setName(resultSet.getString("name"));
+                    ingredient.setPrice(resultSet.getDouble("price"));
+                    ingredient.setCategory(CategoryEnum.valueOf(resultSet.getString("category")));
+
+                    return Optional.of(ingredient);
+                }
+            }
+            return Optional.empty();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public List<Ingredient> mapResultSetToIngredients(ResultSet resultSet) throws SQLException {

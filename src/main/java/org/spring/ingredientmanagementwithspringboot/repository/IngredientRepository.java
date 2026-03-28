@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface IngredientRepository {
     List<Ingredient> findAll();
-    Ingredient findOne(long id);
+    Optional<Ingredient> findOne(int id);
 
 }
