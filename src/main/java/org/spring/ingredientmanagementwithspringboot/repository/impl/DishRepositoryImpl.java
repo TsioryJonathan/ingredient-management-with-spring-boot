@@ -1,21 +1,74 @@
 package org.spring.ingredientmanagementwithspringboot.repository.impl;
 
 import org.spring.ingredientmanagementwithspringboot.datasource.Datasource;
-import org.spring.ingredientmanagementwithspringboot.entity.Dish;
-import org.spring.ingredientmanagementwithspringboot.entity.DishIngredient;
+import org.spring.ingredientmanagementwithspringboot.entity.*;
+import org.spring.ingredientmanagementwithspringboot.entity.CategoryEnum;
+import org.spring.ingredientmanagementwithspringboot.entity.DishTypeEnum;
+import org.spring.ingredientmanagementwithspringboot.entity.Enum.UnitType;
 import org.spring.ingredientmanagementwithspringboot.repository.DishRepository;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class DishRepositoryImpl implements DishRepository {
+    private final Datasource datasource;
     public DishRepositoryImpl(Datasource datasource) {
+        this.datasource = datasource;
     }
     @Override
     public List<Dish> findAll() {
-        return List.of();
+        String sql = """
+                select d.id, d.name,d.dish_type,  d.selling_price , i.id id_ing, i.name ing_name, i.category ing_cat , i.price ing_price,di.id di_id, di.quantity_required, di.unit
+                 from dish d
+                  join dishingredient di on d.id = di.id_dish
+                  join ingredient i on di.id_ingredient = i.id
+                  order by d.id
+                """;
+        Map<Integer, Dish> dishMap = new HashMap<>();
+        try(Connection conn = datasource.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery()
+        ){
+            while(rs.next()){
+                Dish dish = dishMap.get(rs.getInt("id"));
+
+                if(dish == null){
+                    dish = new Dish();
+                    dish.setId(rs.getInt("id"));
+                    dish.setName(rs.getString("name"));
+                    dish.setDishType(DishTypeEnum.valueOf(rs.getString("dish_type")));
+                    dish.setPrice(rs.getDouble("selling_price"));
+                    dish.setDishIngredientList(new ArrayList<>());
+                    dishMap.put(rs.getInt("id"), dish);
+                }
+                DishIngredient di = new DishIngredient();
+                Ingredient ing  = new Ingredient();
+                di.setId(rs.getInt("di_id"));
+                di.setUnit(UnitType.valueOf(rs.getString("unit")));
+                di.setQuantity_required(rs.getDouble("quantity_required"));
+
+                ing.setId(rs.getInt("id_ing"));
+                ing.setName(rs.getString("ing_name"));
+                ing.setCategory(CategoryEnum.valueOf(rs.getString("ing_cat")));
+                ing.setPrice(rs.getDouble("ing_price"));
+
+                di.setIngredient(ing);
+                dish.getDishIngredientList().add(di);
+            }
+            return List.copyOf(dishMap.values());
+
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Override

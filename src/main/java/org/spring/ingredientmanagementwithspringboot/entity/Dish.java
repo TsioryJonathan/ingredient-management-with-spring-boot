@@ -1,10 +1,13 @@
 package org.spring.ingredientmanagementwithspringboot.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.spring.ingredientmanagementwithspringboot.entity.DishTypeEnum;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,7 +20,13 @@ public class Dish {
     private Double price;
     private String name;
     private DishTypeEnum dishType;
+    @JsonIgnore
     private List<DishIngredient> dishIngredientList;
+
+    @JsonProperty("ingredients")
+    public List<Ingredient> getIngredients() {
+        return dishIngredientList.stream().map(DishIngredient::getIngredient).collect(Collectors.toList());
+    }
 
     public void setDishIngredientList(List<DishIngredient> dishIngredientList) {
         if(this.dishIngredientList != null && !this.dishIngredientList.isEmpty()){
@@ -30,7 +39,7 @@ public class Dish {
             }
         }
     }
-
+    @JsonIgnore
     public Double getDishCost() {
         double totalPrice = 0;
         for (DishIngredient dishIngredient : dishIngredientList) {
@@ -38,7 +47,7 @@ public class Dish {
         }
         return totalPrice;
     }
-
+    @JsonIgnore
     public Double getGrossMargin() {
         if (price == null) {
             throw new RuntimeException("Price is null");

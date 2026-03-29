@@ -1,5 +1,6 @@
 package org.spring.ingredientmanagementwithspringboot.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.spring.ingredientmanagementwithspringboot.entity.Enum.UnitType;
 
