@@ -21,21 +21,20 @@ public class Ingredient {
     private List<StockMovement> stockMovementList;
 
     /* getStockValueAt method */
-    public StockValue getStockValueAt(Instant time){
+    public StockValue getStockValueAt(Instant time, UnitType unitType) {
         List<StockMovement> concerned =  stockMovementList.stream().filter(stockMovement -> stockMovement.getCreationDatetime().isBefore(time)
         || stockMovement.getCreationDatetime().equals(time))
                 .toList();
         double quantity = 0.0;
         for (StockMovement sm : concerned) {
             double quantitySm = sm.getValue().getQuantity();
-            UnitType unitType = sm.getValue().getUnit();
             if(sm.getType() == org.spring.ingredientmanagementwithspringboot.entity.MovementTypeEnum.IN){
                 quantity += quantitySm;
             } else {
                 quantity -= quantitySm;
             }
         }
-        return new StockValue(quantity, UnitType.KG);
+        return new StockValue(quantity,unitType);
     };
 
 }

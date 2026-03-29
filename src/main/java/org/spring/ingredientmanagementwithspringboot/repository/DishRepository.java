@@ -6,9 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public abstract class DishRepository {
-    public abstract List<Dish> findAll();
-    public abstract Dish findOne(int id);
-    public abstract List<DishIngredient> findIngredientsByDishId(int id);
+public interface DishRepository {
+    List<Dish> findAll();
+    Dish findOne(int id);
+    List<DishIngredient> findIngredientsByDishId(int id);
 
 }

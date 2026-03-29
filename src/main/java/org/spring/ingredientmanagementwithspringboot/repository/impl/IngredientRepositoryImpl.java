@@ -54,7 +54,6 @@ public class IngredientRepositoryImpl implements IngredientRepository {
                                 from ingredient
                                 where ingredient.id = ?;
                                 """);
-
                 ){
             preparedStatement.setInt(1, id);
             try(

@@ -10,10 +10,8 @@ import java.sql.Connection;
 import java.util.List;
 
 @Repository
-public class DishRepositoryImpl extends DishRepository {
-    private final Datasource datasource;
+public class DishRepositoryImpl implements DishRepository {
     public DishRepositoryImpl(Datasource datasource) {
-        this.datasource = datasource ;
     }
     @Override
     public List<Dish> findAll() {
