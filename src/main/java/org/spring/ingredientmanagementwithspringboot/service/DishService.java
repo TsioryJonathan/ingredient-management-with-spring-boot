@@ -4,6 +4,8 @@ import org.spring.ingredientmanagementwithspringboot.entity.Dish;
 import org.spring.ingredientmanagementwithspringboot.entity.DishIngredient;
 import org.spring.ingredientmanagementwithspringboot.entity.Enum.UnitType;
 import org.spring.ingredientmanagementwithspringboot.entity.Ingredient;
+import org.spring.ingredientmanagementwithspringboot.exception.DishNotFoundException;
+import org.spring.ingredientmanagementwithspringboot.exception.IngredientNotFoundException;
 import org.spring.ingredientmanagementwithspringboot.repository.DishIngredientRepository;
 import org.spring.ingredientmanagementwithspringboot.repository.DishRepository;
 import org.spring.ingredientmanagementwithspringboot.repository.IngredientRepository;
@@ -34,20 +36,18 @@ public class DishService {
 
     public Dish updateDishIngredient(int id, List<DishIngredient> dishIngredientList) {
         if(!dishRepository.checkIfExist(id)){
-            throw new RuntimeException("Dish with id " + id + " does not exist");
+            throw new DishNotFoundException(id);
         }
-
         if(dishIngredientList != null && !dishIngredientList.isEmpty()){
             for(DishIngredient di : dishIngredientList){
                 if(di.getIngredient() == null || di.getIngredient().getId() == null){
                     throw new RuntimeException("Ingredient ID is required");
                 }
                 if(!ingredientRepository.checkIfExist(di.getIngredient().getId())){
-                    throw new RuntimeException("Ingredient with id " + di.getIngredient().getId() + " does not exist");
+                    throw new IngredientNotFoundException(di.getIngredient().getId());
                 }
             }
         }
-
         dishIngredientRepository.detachIngredient(id);
         if(dishIngredientList != null && !dishIngredientList.isEmpty()){
             dishIngredientRepository.attachIngredient(id,dishIngredientList);

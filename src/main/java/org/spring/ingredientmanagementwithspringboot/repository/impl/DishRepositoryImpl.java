@@ -35,7 +35,7 @@ public class DishRepositoryImpl implements DishRepository {
         Map<Integer, Dish> dishMap = new HashMap<>();
         try(Connection conn = datasource.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            ResultSet rs = pstmt.executeQuery()
+            ResultSet rs = pstmt.executeQuery();
         ){
             while(rs.next()){
                 Dish dish = dishMap.get(rs.getInt("id"));

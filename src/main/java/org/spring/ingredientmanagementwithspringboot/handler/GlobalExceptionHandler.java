@@ -1,5 +1,6 @@
 package org.spring.ingredientmanagementwithspringboot.handler;
 
+import org.spring.ingredientmanagementwithspringboot.exception.DishNotFoundException;
 import org.spring.ingredientmanagementwithspringboot.exception.IngredientNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,11 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(IngredientNotFoundException.class)
     public ResponseEntity<String> handleIngredientNotFoundException(IngredientNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
+    @ExceptionHandler(DishNotFoundException.class)
+    public ResponseEntity<String> handleDishNotFoundException(DishNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 }

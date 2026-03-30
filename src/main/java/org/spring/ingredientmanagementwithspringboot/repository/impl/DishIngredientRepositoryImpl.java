@@ -23,8 +23,11 @@ public class DishIngredientRepositoryImpl implements DishIngredientRepository {
                 INSERT INTO dishingredient (id_dish, id_ingredient, quantity_required, unit)
                 VALUES (?, ?, ? , ?::unit_type)
                 """;
-        try(Connection conn = datasource.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)){
+        Connection conn = null;
+        try{
+            conn = datasource.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            conn.setAutoCommit(false);
             for(DishIngredient di : dishIngredient){
                 stmt.setInt(1, dishId);
                 stmt.setInt(2, di.getIngredient().getId());
@@ -33,8 +36,18 @@ public class DishIngredientRepositoryImpl implements DishIngredientRepository {
                 stmt.addBatch();
             }
             stmt.executeBatch();
+            conn.commit();
         } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
             throw new RuntimeException(e);
+        } finally {
+            if(conn != null){
+                datasource.closeConnection(conn);
+            }
         };
     }
 
