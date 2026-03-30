@@ -64,7 +64,6 @@ public class DishRepositoryImpl implements DishRepository {
                 dish.getDishIngredientList().add(di);
             }
             return List.copyOf(dishMap.values());
-
         }catch (SQLException e){
             throw new RuntimeException(e);
         }
@@ -73,11 +72,85 @@ public class DishRepositoryImpl implements DishRepository {
 
     @Override
     public Dish findOne(int id) {
-        return null;
+        String sql = """
+                select d.id,d.name,d.selling_price, d.dish_type
+                from dish d
+                where d.id = ?
+                """;
+        try(Connection conn = datasource.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            ){
+            pstmt.setInt(1 , id);
+            try(ResultSet rs = pstmt.executeQuery()){
+                if(rs.next()){
+                    Dish dish = new Dish();
+                    dish.setId(rs.getInt("id"));
+                    dish.setName(rs.getString("name"));
+                    dish.setPrice(rs.getDouble("selling_price"));
+                    dish.setDishType(DishTypeEnum.valueOf(rs.getString("dish_type")));
+                    return dish;
+                }
+            }
+            return null;
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public List<DishIngredient> findIngredientsByDishId(int id) {
-        return List.of();
+        String sql = """
+                select i.id id_ing, i.name ing_name, i.category ing_cat , i.price ing_price,di.id di_id, di.quantity_required, di.unit
+                 from dish d
+                  join dishingredient di on d.id = di.id_dish
+                  join ingredient i on di.id_ingredient = i.id
+                  where d.id = ?
+                """;
+        List<DishIngredient> dishIngredients = new ArrayList<>();
+        try(Connection conn = datasource.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+        ){
+            pstmt.setInt(1, id);
+            try(ResultSet rs = pstmt.executeQuery()){
+                while(rs.next()){
+                    DishIngredient di = new DishIngredient();
+                    Ingredient ing  = new Ingredient();
+                    di.setId(rs.getInt("di_id"));
+                    di.setUnit(UnitType.valueOf(rs.getString("unit")));
+                    di.setQuantity_required(rs.getDouble("quantity_required"));
+
+                    ing.setId(rs.getInt("id_ing"));
+                    ing.setName(rs.getString("ing_name"));
+                    ing.setCategory(CategoryEnum.valueOf(rs.getString("ing_cat")));
+                    ing.setPrice(rs.getDouble("ing_price"));
+
+                    di.setIngredient(ing);
+                    dishIngredients.add(di);
+                }
+            }
+            return dishIngredients;
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
     }
+
+    @Override
+    public boolean checkIfExist(int id) {
+        String sql = """
+                select 1
+                from dish d
+                where d.id = ?
+                """;
+        try(Connection conn = datasource.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+        ){
+            pstmt.setInt(1, id);
+            try(ResultSet rs = pstmt.executeQuery()){
+                return rs.next();
+            }
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
+
 }

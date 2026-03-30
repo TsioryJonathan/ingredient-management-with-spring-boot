@@ -88,4 +88,23 @@ public class IngredientRepositoryImpl implements IngredientRepository {
         }
         return ingredients;
     }
+
+    @Override
+    public boolean checkIfExist(int id) {
+        String sql = """
+                select 1
+                from ingredient
+                where ingredient.id = ?
+                """;
+        try(Connection connection = datasource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        ){
+            preparedStatement.setInt(1, id);
+            try(ResultSet resultSet = preparedStatement.executeQuery()){
+                return resultSet.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
