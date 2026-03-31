@@ -45,6 +45,9 @@ public class IngredientController {
 
     @PostMapping("/{id}/stockMovements")
     public ResponseEntity<?> createStockMovement(@PathVariable(required = true) int id, @RequestBody List<StockMovement> stockMovementList){
+        if(stockMovementList == null || stockMovementList.isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Request body is empty or null.");
+        }
         return ResponseEntity.created(URI.create("")).body(ingredientService.createStockMovement(id, stockMovementList));
     }
 }

@@ -55,18 +55,9 @@ Content-Type: application/json
 [
     {
       "value": {
-        "quantity": 13,
-        "unit": "PCS"
+        "quantity": 15,
+        "unit": "KG"
       },
-        "type": "OUT",
-        "creationDatetime": "2025-10-01T12:00:00Z"
-    },
-    {
-        "value": {
-            "quantity": 2,
-            "unit": "KG"
-        },
-            "type": "IN",
-            "creationDatetime": "2025-10-02T12:00:00Z"
+        "type": "IN"
     }
 ]
