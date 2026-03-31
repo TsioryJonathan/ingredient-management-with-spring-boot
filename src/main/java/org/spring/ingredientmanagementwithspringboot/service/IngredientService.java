@@ -39,9 +39,23 @@ public class IngredientService {
 
     public List<StockMovement> getStockMovements(int id, Instant from, Instant to){
             Ingredient ingredient = getIngredientById(id);
-           return stockMovementRepository.findOneByIngredientId(id)
+            if(from == null){
+                from = Instant.EPOCH;
+            }
+            if(to == null){
+                to = Instant.now();
+            }
+        Instant finalFrom = from;
+        Instant finalTo = to;
+        return stockMovementRepository.findOneByIngredientId(id)
                    .stream()
-                   .filter(stockMovement -> stockMovement.getCreationDatetime().isAfter(from) || stockMovement.getCreationDatetime().equals(from) && stockMovement.getCreationDatetime().isBefore(to) || stockMovement.getCreationDatetime().equals(to)).toList();
+                   .filter(stockMovement -> stockMovement.getCreationDatetime().isAfter(finalFrom) || stockMovement.getCreationDatetime().equals(finalFrom) && stockMovement.getCreationDatetime().isBefore(finalTo) || stockMovement.getCreationDatetime().equals(finalTo)).toList();
     }
 
+    public List<StockMovement> createStockMovement(int id, List<StockMovement> stockMovementList){
+       if(!ingredientRepository.checkIfExist(id)) {
+           throw new IngredientNotFoundException(id);
+       }
+        return stockMovementRepository.createStockMovement(id, stockMovementList);
+    }
 }

@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface StockMovementRepository {
     public List<StockMovement> findOneByIngredientId(int id);
+    public List<StockMovement> createStockMovement(int ingId,List<StockMovement> stockMovementList);
 }

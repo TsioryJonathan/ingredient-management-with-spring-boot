@@ -15,6 +15,4 @@ public class StockMovement {
     private StockValue value;
     private org.spring.ingredientmanagementwithspringboot.entity.MovementTypeEnum type;
     private Instant creationDatetime;
-
-
 }

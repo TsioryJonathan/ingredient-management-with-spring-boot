@@ -46,4 +46,27 @@ Content-Type: application/json
 []
 
 ### Get stock movements for ingredient
-GET localhost:8080/ingredients/1/stockMovements?from=2024-01-01T00:00:00Z&to=2024-01-06T09:00:00Z
+GET localhost:8080/ingredients/2/stockMovements?from=2024-01-06T00:00:00Z
+
+### Create new stock movement
+POST localhost:8080/ingredients/2/stockMovements
+Content-Type: application/json
+
+[
+    {
+      "value": {
+        "quantity": 13,
+        "unit": "PCS"
+      },
+        "type": "OUT",
+        "creationDatetime": "2025-10-01T12:00:00Z"
+    },
+    {
+        "value": {
+            "quantity": 2,
+            "unit": "KG"
+        },
+            "type": "IN",
+            "creationDatetime": "2025-10-02T12:00:00Z"
+    }
+]

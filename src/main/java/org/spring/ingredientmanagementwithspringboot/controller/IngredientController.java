@@ -2,11 +2,13 @@ package org.spring.ingredientmanagementwithspringboot.controller;
 
 import org.spring.ingredientmanagementwithspringboot.entity.Enum.UnitType;
 import org.spring.ingredientmanagementwithspringboot.entity.Ingredient;
+import org.spring.ingredientmanagementwithspringboot.entity.StockMovement;
 import org.spring.ingredientmanagementwithspringboot.service.IngredientService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 
@@ -38,9 +40,11 @@ public class IngredientController {
     
     @GetMapping("/{id}/stockMovements")
     public ResponseEntity<?> getStockMovements(@PathVariable(required = true) int id, @RequestParam(required = false) Instant from, @RequestParam(required = false) Instant to){
-        if(from == null || to == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Either mandatory query parameter `from` or `to` is not provided.");
-        }
         return ResponseEntity.ok(ingredientService.getStockMovements(id, from, to));
+    }
+
+    @PostMapping("/{id}/stockMovements")
+    public ResponseEntity<?> createStockMovement(@PathVariable(required = true) int id, @RequestBody List<StockMovement> stockMovementList){
+        return ResponseEntity.created(URI.create("")).body(ingredientService.createStockMovement(id, stockMovementList));
     }
 }
