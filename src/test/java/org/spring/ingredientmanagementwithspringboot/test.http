@@ -5,7 +5,7 @@ GET localhost:8080/ingredients
 GET localhost:8080/ingredients/1
 
 ### Get stock value at specific time
-GET localhost:8080/ingredients/1/stock?at=2024-06-01T12:00:00Z&unit=KG
+GET localhost:8080/ingredients/5/stock?at=2026-06-01T12:00:00Z&unit=KG
 
 ### Get all dishes
 GET localhost:8080/dishes
@@ -18,7 +18,7 @@ Content-Type: application/json
 [
   {
     "ingredient": {
-      "id": 1000
+      "id": 1
     },
     "quantity_required": 2.5,
     "unit": "KG"
@@ -46,10 +46,10 @@ Content-Type: application/json
 []
 
 ### Get stock movements for ingredient
-GET localhost:8080/ingredients/2/stockMovements?from=2024-01-06T00:00:00Z
+GET localhost:8080/ingredients/5/stockMovements?from=2023-01-06T00:00:00Z
 
 ### Create new stock movement
-POST localhost:8080/ingredients/2/stockMovements
+POST localhost:8080/ingredients/5/stockMovements
 Content-Type: application/json
 
 [
