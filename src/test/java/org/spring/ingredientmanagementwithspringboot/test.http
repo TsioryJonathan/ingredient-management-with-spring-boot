@@ -44,3 +44,6 @@ PUT localhost:8080/dishes/1/ingredients
 Content-Type: application/json
 
 []
+
+### Get stock movements for ingredient
+GET localhost:8080/ingredients/1/stockMovements?from=2024-01-01T00:00:00Z&to=2024-01-06T09:00:00Z

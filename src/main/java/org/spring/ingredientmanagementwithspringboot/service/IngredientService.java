@@ -37,4 +37,11 @@ public class IngredientService {
         return ingredient.getStockValueAt(at, unit);
     }
 
+    public List<StockMovement> getStockMovements(int id, Instant from, Instant to){
+            Ingredient ingredient = getIngredientById(id);
+           return stockMovementRepository.findOneByIngredientId(id)
+                   .stream()
+                   .filter(stockMovement -> stockMovement.getCreationDatetime().isAfter(from) || stockMovement.getCreationDatetime().equals(from) && stockMovement.getCreationDatetime().isBefore(to) || stockMovement.getCreationDatetime().equals(to)).toList();
+    }
+
 }
