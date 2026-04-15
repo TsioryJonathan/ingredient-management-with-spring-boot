@@ -4,7 +4,7 @@ info:
   description: Specification to manage ingredients and dishes
   version: 1.0.0
 servers:
-  - url: http://localhost:8080
+  - url: http://localhost:8000
 
 tags:
   - name: Ingredients
@@ -27,6 +27,15 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Ingredient'
+              example:
+                - id: 1
+                  name: Tomato
+                  category: VEGETABLE
+                  price: 2.5
+                - id: 2
+                  name: Chicken
+                  category: ANIMAL
+                  price: 8.0
 
   /ingredients/{id}:
     get:
@@ -43,12 +52,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ingredient'
+              example:
+                id: 1
+                name: Tomato
+                category: VEGETABLE
+                price: 2.5
         404:
           description: Ingredient not found
           content:
             text/plain:
               schema:
                 type: string
+                example: Ingredient.id=1 is not found
 
   /ingredients/{id}/stock:
     get:
@@ -67,10 +82,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockValue'
+              example:
+                quantity: 15.5
+                unit: KG
         400:
           description: Missing mandatory query parameter
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Either mandatory query parameter `at` or `unit` is not provided.
         404:
           description: Ingredient not found
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Ingredient.id=1 is not found
 
   /dishes:
     get:
@@ -87,6 +115,16 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Dish'
+              example:
+                - id: 1
+                  name: Poulet grillé
+                  price: 12.9
+                  dishType: MAIN
+                  ingredients:
+                    - id: 1
+                      name: Chicken
+                      category: ANIMAL
+                      price: 8.0
 
   /dishes/{id}/ingredients:
     put:
@@ -103,7 +141,16 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/Ingredient'
+                $ref: '#/components/schemas/DishIngredient'
+            example:
+              - ingredient:
+                  id: 1
+                quantity_required: 2.5
+                unit: KG
+              - ingredient:
+                  id: 3
+                quantity_required: 1.0
+                unit: PCS
       responses:
         200:
           description: Updated dish with its ingredients
@@ -111,10 +158,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Dish'
+              example:
+                id: 1
+                name: Poulet grillé
+                price: 12.9
+                dishType: MAIN
+                ingredients:
+                  - id: 1
+                    name: Chicken
+                    category: ANIMAL
+                    price: 8.0
+                  - id: 3
+                    name: Rice
+                    category: VEGETABLE
+                    price: 1.5
         400:
           description: Missing request body
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Request body is required
         404:
           description: Dish not found
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Dish.id=1 is not found
 
 components:
 
@@ -125,6 +196,7 @@ components:
       description: Ingredient identifier
       schema:
         type: integer
+        example: 1
       required: true
 
     DishIdentifierPathParameter:
@@ -133,6 +205,7 @@ components:
       description: Dish identifier
       schema:
         type: integer
+        example: 1
       required: true
 
     AtQueryParameter:
@@ -142,6 +215,7 @@ components:
       schema:
         type: string
         format: date-time
+        example: 2026-06-01T12:00:00Z
       required: true
 
     UnitQueryParameter:
@@ -150,6 +224,7 @@ components:
       description: Unit of measurement for the stock
       schema:
         $ref: '#/components/schemas/UnitType'
+        example: KG
       required: true
 
   schemas:
@@ -162,6 +237,16 @@ components:
         - MARINE
         - DAIRY
         - OTHER
+      example: VEGETABLE
+
+    DishTypeEnum:
+      type: string
+      enum:
+        - START
+        - MAIN
+        - STARTER
+        - DESSERT
+      example: MAIN
 
     UnitType:
       type: string
@@ -169,19 +254,23 @@ components:
         - KG
         - PCS
         - L
+      example: KG
 
     Ingredient:
       type: object
       properties:
         id:
           type: integer
+          example: 1
         name:
           type: string
+          example: Tomato
         category:
           $ref: '#/components/schemas/CategoryEnum'
         price:
           type: number
           format: float
+          example: 2.5
 
     StockValue:
       type: object
@@ -189,6 +278,23 @@ components:
         quantity:
           type: number
           format: float
+          example: 15.5
+        unit:
+          $ref: '#/components/schemas/UnitType'
+
+    DishIngredient:
+      type: object
+      properties:
+        ingredient:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+        quantity_required:
+          type: number
+          format: float
+          example: 2.5
         unit:
           $ref: '#/components/schemas/UnitType'
 
@@ -197,11 +303,16 @@ components:
       properties:
         id:
           type: integer
+          example: 1
         name:
           type: string
+          example: Poulet grillé
         price:
           type: number
           format: float
+          example: 12.9
+        dishType:
+          $ref: '#/components/schemas/DishTypeEnum'
         ingredients:
           type: array
           items:
