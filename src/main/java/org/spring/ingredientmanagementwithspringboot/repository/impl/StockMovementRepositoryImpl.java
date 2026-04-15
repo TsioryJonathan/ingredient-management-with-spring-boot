@@ -40,7 +40,7 @@ public class StockMovementRepositoryImpl implements StockMovementRepository {
                     stockValue.setUnit(UnitType.valueOf(rs.getString("unit")));
                     stockMovement.setValue(stockValue);
                     stockMovement.setType(MovementTypeEnum.valueOf(rs.getString("type")));
-                    stockMovement.setCreationDatetime(rs.getTimestamp("creation_datetime").toInstant());
+                    stockMovement.setCreationDatetime(rs.getTimestamp("creation_datetime", java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"))).toInstant());
                     stockMovements.add(stockMovement);
                 }
             }

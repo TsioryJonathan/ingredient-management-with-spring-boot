@@ -1,0 +1,208 @@
+openapi: 3.0.3
+info:
+  title: Ingredient and Dish Management API
+  description: Specification to manage ingredients and dishes
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+
+tags:
+  - name: Ingredients
+  - name: Dishes
+
+paths:
+
+  /ingredients:
+    get:
+      tags:
+        - Ingredients
+      summary: Get all ingredients
+      description: Returns list of ingredients
+      responses:
+        200:
+          description: List of ingredients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ingredient'
+
+  /ingredients/{id}:
+    get:
+      tags:
+        - Ingredients
+      summary: Get an ingredient by ID
+      description: Returns an ingredient based on its id
+      parameters:
+        - $ref: '#/components/parameters/IngredientIdentifierPathParameter'
+      responses:
+        200:
+          description: Ingredient found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+        404:
+          description: Ingredient not found
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /ingredients/{id}/stock:
+    get:
+      tags:
+        - Ingredients
+      summary: Get stock value of an ingredient at a specific time
+      description: Returns the stock value for the ingredient with the provided identifier at the specified time and unit
+      parameters:
+        - $ref: '#/components/parameters/IngredientIdentifierPathParameter'
+        - $ref: '#/components/parameters/AtQueryParameter'
+        - $ref: '#/components/parameters/UnitQueryParameter'
+      responses:
+        200:
+          description: Stock value retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockValue'
+        400:
+          description: Missing mandatory query parameter
+        404:
+          description: Ingredient not found
+
+  /dishes:
+    get:
+      tags:
+        - Dishes
+      summary: Get all dishes
+      description: Returns list of dishes
+      responses:
+        200:
+          description: List of dishes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dish'
+
+  /dishes/{id}/ingredients:
+    put:
+      tags:
+        - Dishes
+      summary: Update ingredients associated with a dish
+      description: Allows associating or dissociating a list of ingredients to the dish identified by id
+      parameters:
+        - $ref: '#/components/parameters/DishIdentifierPathParameter'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Ingredient'
+      responses:
+        200:
+          description: Updated dish with its ingredients
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dish'
+        400:
+          description: Missing request body
+        404:
+          description: Dish not found
+
+components:
+
+  parameters:
+    IngredientIdentifierPathParameter:
+      in: path
+      name: id
+      description: Ingredient identifier
+      schema:
+        type: integer
+      required: true
+
+    DishIdentifierPathParameter:
+      in: path
+      name: id
+      description: Dish identifier
+      schema:
+        type: integer
+      required: true
+
+    AtQueryParameter:
+      in: query
+      name: at
+      description: Timestamp at which to retrieve the stock value
+      schema:
+        type: string
+        format: date-time
+      required: true
+
+    UnitQueryParameter:
+      in: query
+      name: unit
+      description: Unit of measurement for the stock
+      schema:
+        $ref: '#/components/schemas/UnitType'
+      required: true
+
+  schemas:
+
+    CategoryEnum:
+      type: string
+      enum:
+        - VEGETABLE
+        - ANIMAL
+        - MARINE
+        - DAIRY
+        - OTHER
+
+    UnitType:
+      type: string
+      enum:
+        - KG
+        - PCS
+        - L
+
+    Ingredient:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        price:
+          type: number
+          format: float
+
+    StockValue:
+      type: object
+      properties:
+        quantity:
+          type: number
+          format: float
+        unit:
+          $ref: '#/components/schemas/UnitType'
+
+    Dish:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: number
+          format: float
+        ingredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ingredient'
